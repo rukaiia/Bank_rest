@@ -5,7 +5,7 @@ spring:
   datasource:
     url: jdbc:postgresql://db:5432/bank_rest
     username: postgres
-    password: postgres  # тоже нужно поменять на postgres
+    password: postgres
     driver-class-name: org.postgresql.Driver
 
   liquibase:

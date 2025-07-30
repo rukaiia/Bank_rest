@@ -10,7 +10,9 @@ Swagger UI доступен по адресу: `http://localhost:8089/swagger-ui
 
 ## Запуск через Docker
 
-1. В корне проекта выполнить:
+1.Соберите проект с помощью Maven:
+ ```bash
+mvn clean package -DskipTests
 
 ```bash
 docker-compose up --build
