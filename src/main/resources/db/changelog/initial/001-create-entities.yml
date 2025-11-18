@@ -1,115 +1,106 @@
 databaseChangeLog:
   - changeSet:
-      id: 001
+      id: seed_test_data_v2
       author: Rukaiia
       changes:
 
-        - createTable:
+        # --- РОЛИ ---
+        - insert:
             tableName: roles
             columns:
-              - column:
-                  name: id
-                  type: BIGINT
-                  autoIncrement: true
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: name
-                  type: VARCHAR(255)
-                  constraints:
-                    nullable: false
+              - column: { name: id, valueNumeric: 1 }
+              - column: { name: name, value: "ADMIN" }
 
-        - createTable:
+        - insert:
+            tableName: roles
+            columns:
+              - column: { name: id, valueNumeric: 2 }
+              - column: { name: name, value: "USER" }
+
+        # --- ПОЛЬЗОВАТЕЛИ ---
+        - insert:
             tableName: users
             columns:
-              - column:
-                  name: id
-                  type: BIGINT
-                  autoIncrement: true
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: username
-                  type: VARCHAR(255)
-                  constraints:
-                    nullable: false
-                    unique: true
-              - column:
-                  name: password
-                  type: VARCHAR(255)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: role_id
-                  type: BIGINT
-                  constraints:
-                    nullable: false
-              - column:
-                  name: enabled
-                  type: BOOLEAN
-                  constraints:
-                    nullable: false
-              - column:
-                  name: status
-                  type: VARCHAR(50)
-                  constraints:
-                    nullable: false
+              - column: { name: id, valueNumeric: 1 }
+              - column: { name: username, value: "admin" }
+              - column: { name: password, value: "$2a$10$7Q6..../hashedpassword" }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: enabled, valueBoolean: true }
+              - column: { name: status, value: "ACTIVE" }
 
-        - addForeignKeyConstraint:
-            baseTableName: users
-            baseColumnNames: role_id
-            referencedTableName: roles
-            referencedColumnNames: id
-            constraintName: fk_users_roles
+        - insert:
+            tableName: users
+            columns:
+              - column: { name: id, valueNumeric: 2 }
+              - column: { name: username, value: "user1" }
+              - column: { name: password, value: "$2a$10$abcd...hashedpassword" }
+              - column: { name: role_id, valueNumeric: 2 }
+              - column: { name: enabled, valueBoolean: true }
+              - column: { name: status, value: "ACTIVE" }
 
-        - createTable:
+        # --- КАРТЫ ДЛЯ АДМИНА ---
+        - insert:
             tableName: cards
             columns:
-              - column:
-                  name: id
-                  type: BIGINT
-                  autoIncrement: true
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: encrypted_number
-                  type: VARCHAR(255)
-                  constraints:
-                    nullable: false
-                    unique: true
-              - column:
-                  name: masked_number
-                  type: VARCHAR(255)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: owner_id
-                  type: BIGINT
-                  constraints:
-                    nullable: false
-              - column:
-                  name: expiry_date
-                  type: DATE
-                  constraints:
-                    nullable: false
-              - column:
-                  name: status
-                  type: VARCHAR(50)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: balance
-                  type: DECIMAL(19, 2)
-                  defaultValueNumeric: 0.00
-                  constraints:
-                    nullable: false
+              - column: { name: id, valueNumeric: 1 }
+              - column: { name: encrypted_number, value: "ENC1111222233334444" }
+              - column: { name: masked_number, value: "1111-2222-3333-4444" }
+              - column: { name: owner_id, valueNumeric: 1 }
+              - column: { name: expiry_date, valueDate: "2026-12-31" }
+              - column: { name: status, value: "ACTIVE" }
+              - column: { name: balance, valueNumeric: 1000 }
 
-        - addForeignKeyConstraint:
-            baseTableName: cards
-            baseColumnNames: owner_id
-            referencedTableName: users
-            referencedColumnNames: id
-            constraintName: fk_cards_users
+        - insert:
+            tableName: cards
+            columns:
+              - column: { name: id, valueNumeric: 2 }
+              - column: { name: encrypted_number, value: "ENC5555666677778888" }
+              - column: { name: masked_number, value: "5555-6666-7777-8888" }
+              - column: { name: owner_id, valueNumeric: 1 }
+              - column: { name: expiry_date, valueDate: "2025-06-30" }
+              - column: { name: status, value: "BLOCKED" }
+              - column: { name: balance, valueNumeric: 0 }
+
+        # --- КАРТЫ ДЛЯ USER ---
+        - insert:
+            tableName: cards
+            columns:
+              - column: { name: id, valueNumeric: 3 }
+              - column: { name: encrypted_number, value: "ENC9999000011112222" }
+              - column: { name: masked_number, value: "9999-0000-1111-2222" }
+              - column: { name: owner_id, valueNumeric: 2 }
+              - column: { name: expiry_date, valueDate: "2026-01-01" }
+              - column: { name: status, value: "ACTIVE" }
+              - column: { name: balance, valueNumeric: 500 }
+
+        - insert:
+            tableName: cards
+            columns:
+              - column: { name: id, valueNumeric: 4 }
+              - column: { name: encrypted_number, value: "ENC3333444455556666" }
+              - column: { name: masked_number, value: "3333-4444-5555-6666" }
+              - column: { name: owner_id, valueNumeric: 2 }
+              - column: { name: expiry_date, valueDate: "2025-12-31" }
+              - column: { name: status, value: "EXPIRED" }
+              - column: { name: balance, valueNumeric: 200 }
+
+        # --- ТРАНСФЕРЫ ---
+        - insert:
+            tableName: transfers
+            columns:
+              - column: { name: id, valueNumeric: 1 }
+              - column: { name: from_card_id, valueNumeric: 1 }
+              - column: { name: to_card_id, valueNumeric: 3 }
+              - column: { name: amount, valueNumeric: 100 }
+              - column: { name: status, value: "COMPLETED" }
+              - column: { name: idempotency_key, value: "transfer-1" }
+
+        - insert:
+            tableName: transfers
+            columns:
+              - column: { name: id, valueNumeric: 2 }
+              - column: { name: from_card_id, valueNumeric: 2 }
+              - column: { name: to_card_id, valueNumeric: 4 }
+              - column: { name: amount, valueNumeric: 50 }
+              - column: { name: status, value: "PENDING" }
+              - column: { name: idempotency_key, value: "transfer-2" }

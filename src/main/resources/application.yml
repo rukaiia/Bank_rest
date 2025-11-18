@@ -4,4 +4,7 @@ spring:
 
   profiles:
     active: local
+liquibase:
+  enabled: true
+  change-log: classpath:/db/changelog/master.yml
 

@@ -1,0 +1,132 @@
+databaseChangeLog:
+  - changeSet:
+      id: test data
+      author: Rukaiia
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 1
+              - column:
+                  name: username
+                  value: "admin"
+              - column:
+                  name: password
+                  value: "$2a$10$7Q6..../hashed password" # bcrypt пароль
+              - column:
+                  name: role
+                  value: "ADMIN"
+              - column:
+                  name: email
+                  value: "admin@example.com"
+
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 2
+              - column:
+                  name: username
+                  value: "user1"
+              - column:
+                  name: password
+                  value: "$2a$10$abcd...hashedpassword"
+              - column:
+                  name: role
+                  value: "USER"
+              - column:
+                  name: email
+                  value: "user1@example.com"
+
+        # Карты для админа
+        - insert:
+            tableName: cards
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 1
+              - column:
+                  name: owner_id
+                  valueNumeric: 1
+              - column:
+                  name: masked_number
+                  value: "1111-2222-3333-4444"
+              - column:
+                  name: balance
+                  valueNumeric: 1000
+              - column:
+                  name: expiry_date
+                  valueDate: "2026-12-31"
+              - column:
+                  name: status
+                  value: "ACTIVE"
+
+        - insert:
+            tableName: cards
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 2
+              - column:
+                  name: owner_id
+                  valueNumeric: 1
+              - column:
+                  name: masked_number
+                  value: "5555-6666-7777-8888"
+              - column:
+                  name: balance
+                  valueNumeric: 0
+              - column:
+                  name: expiry_date
+                  valueDate: "2025-06-30"
+              - column:
+                  name: status
+                  value: "BLOCKED"
+
+        # Карты для обычного пользователя
+        - insert:
+            tableName: cards
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 3
+              - column:
+                  name: owner_id
+                  valueNumeric: 2
+              - column:
+                  name: masked_number
+                  value: "9999-0000-1111-2222"
+              - column:
+                  name: balance
+                  valueNumeric: 500
+              - column:
+                  name: expiry_date
+                  valueDate: "2026-01-01"
+              - column:
+                  name: status
+                  value: "ACTIVE"
+
+        - insert:
+            tableName: cards
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 4
+              - column:
+                  name: owner_id
+                  valueNumeric: 2
+              - column:
+                  name: masked_number
+                  value: "3333-4444-5555-6666"
+              - column:
+                  name: balance
+                  valueNumeric: 200
+              - column:
+                  name: expiry_date
+                  valueDate: "2025-12-31"
+              - column:
+                  name: status
+                  value: "EXPIRED"
