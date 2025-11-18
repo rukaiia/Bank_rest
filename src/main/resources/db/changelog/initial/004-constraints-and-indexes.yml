@@ -5,10 +5,18 @@ databaseChangeLog:
       changes:
         - sql:
             sql: |
+              ALTER TABLE cards DROP CONSTRAINT IF EXISTS chk_cards_balance;
+              ALTER TABLE cards DROP CONSTRAINT IF EXISTS chk_cards_expiry;
+              ALTER TABLE cards DROP CONSTRAINT IF EXISTS chk_cards_status;
+              ALTER TABLE transfers DROP CONSTRAINT IF EXISTS chk_transfers_amount;
+
+              UPDATE cards
+              SET expiry_date = CURRENT_DATE
+              WHERE expiry_date < CURRENT_DATE;
+
               ALTER TABLE cards ADD CONSTRAINT chk_cards_balance CHECK (balance >= 0);
               ALTER TABLE cards ADD CONSTRAINT chk_cards_expiry CHECK (expiry_date >= CURRENT_DATE);
               ALTER TABLE cards ADD CONSTRAINT chk_cards_status CHECK (status IN ('ACTIVE','BLOCKED','EXPIRED'));
-
               ALTER TABLE transfers ADD CONSTRAINT chk_transfers_amount CHECK (amount > 0);
 
               CREATE INDEX IF NOT EXISTS idx_cards_owner ON cards(owner_id);

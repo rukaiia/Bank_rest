@@ -1,132 +1,157 @@
 databaseChangeLog:
+
   - changeSet:
-      id: test data
+      id: role 1
       author: Rukaiia
+      preConditions:
+        - onFail: CONTINUE
+        - onError: CONTINUE
+        - sqlCheck:
+            expectedResult: 0
+            sql: "SELECT COUNT(*) FROM roles WHERE id = 1"
+      changes:
+        - insert:
+            tableName: roles
+            columns:
+              - column: { name: id, valueNumeric: 1 }
+              - column: { name: name, value: "ADMIN" }
+
+  - changeSet:
+      id: role 2
+      author: Rukaiia
+      preConditions:
+        - onFail: CONTINUE
+        - onError: CONTINUE
+        - sqlCheck:
+            expectedResult: 0
+            sql: "SELECT COUNT(*) FROM roles WHERE id = 2"
+      changes:
+        - insert:
+            tableName: roles
+            columns:
+              - column: { name: id, valueNumeric: 2 }
+              - column: { name: name, value: "USER" }
+
+  - changeSet:
+      id: user 1
+      author: Rukaiia
+      preConditions:
+        - onFail: CONTINUE
+        - onError: CONTINUE
+        - sqlCheck:
+            expectedResult: 0
+            sql: "SELECT COUNT(*) FROM users WHERE id = 1"
       changes:
         - insert:
             tableName: users
             columns:
-              - column:
-                  name: id
-                  valueNumeric: 1
-              - column:
-                  name: username
-                  value: "admin"
-              - column:
-                  name: password
-                  value: "$2a$10$7Q6..../hashed password" # bcrypt пароль
-              - column:
-                  name: role
-                  value: "ADMIN"
-              - column:
-                  name: email
-                  value: "admin@example.com"
+              - column: { name: id, valueNumeric: 1 }
+              - column: { name: username, value: "admin" }
+              - column: { name: password, value: "$2a$10$7Q6..../hashed password" }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: enabled, valueBoolean: true }
+              - column: { name: status, value: "ACTIVE" }
 
+  - changeSet:
+      id: user 2
+      author: Rukaiia
+      preConditions:
+        - onFail: CONTINUE
+        - onError: CONTINUE
+        - sqlCheck:
+            expectedResult: 0
+            sql: "SELECT COUNT(*) FROM users WHERE id = 2"
+      changes:
         - insert:
             tableName: users
             columns:
-              - column:
-                  name: id
-                  valueNumeric: 2
-              - column:
-                  name: username
-                  value: "user1"
-              - column:
-                  name: password
-                  value: "$2a$10$abcd...hashedpassword"
-              - column:
-                  name: role
-                  value: "USER"
-              - column:
-                  name: email
-                  value: "user1@example.com"
+              - column: { name: id, valueNumeric: 2 }
+              - column: { name: username, value: "user1" }
+              - column: { name: password, value: "$2a$10$abcd...hashedpassword" }
+              - column: { name: role_id, valueNumeric: 2 }
+              - column: { name: enabled, valueBoolean: true }
+              - column: { name: status, value: "ACTIVE" }
 
-        # Карты для админа
+  - changeSet:
+      id: card 1
+      author: Rukaiia
+      preConditions:
+        - onFail: CONTINUE
+        - onError: CONTINUE
+        - sqlCheck:
+            expectedResult: 0
+            sql: "SELECT COUNT(*) FROM cards WHERE id = 1"
+      changes:
         - insert:
             tableName: cards
             columns:
-              - column:
-                  name: id
-                  valueNumeric: 1
-              - column:
-                  name: owner_id
-                  valueNumeric: 1
-              - column:
-                  name: masked_number
-                  value: "1111-2222-3333-4444"
-              - column:
-                  name: balance
-                  valueNumeric: 1000
-              - column:
-                  name: expiry_date
-                  valueDate: "2026-12-31"
-              - column:
-                  name: status
-                  value: "ACTIVE"
+              - column: { name: id, valueNumeric: 1 }
+              - column: { name: encrypted_number, value: "enc_1111" }
+              - column: { name: masked_number, value: "1111-2222-3333-4444" }
+              - column: { name: owner_id, valueNumeric: 1 }
+              - column: { name: balance, valueNumeric: 1000 }
+              - column: { name: expiry_date, valueDate: "2026-12-31" }
+              - column: { name: status, value: "ACTIVE" }
 
+  - changeSet:
+      id: card 2
+      author: Rukaiia
+      preConditions:
+        - onFail: CONTINUE
+        - onError: CONTINUE
+        - sqlCheck:
+            expectedResult: 0
+            sql: "SELECT COUNT(*) FROM cards WHERE id = 2"
+      changes:
         - insert:
             tableName: cards
             columns:
-              - column:
-                  name: id
-                  valueNumeric: 2
-              - column:
-                  name: owner_id
-                  valueNumeric: 1
-              - column:
-                  name: masked_number
-                  value: "5555-6666-7777-8888"
-              - column:
-                  name: balance
-                  valueNumeric: 0
-              - column:
-                  name: expiry_date
-                  valueDate: "2025-06-30"
-              - column:
-                  name: status
-                  value: "BLOCKED"
+              - column: { name: id, valueNumeric: 2 }
+              - column: { name: encrypted_number, value: "enc_2222" }
+              - column: { name: masked_number, value: "5555-6666-7777-8888" }
+              - column: { name: owner_id, valueNumeric: 1 }
+              - column: { name: balance, valueNumeric: 0 }
+              - column: { name: expiry_date, valueDate: "2026-06-30" }
+              - column: { name: status, value: "BLOCKED" }
 
-        # Карты для обычного пользователя
+  - changeSet:
+      id: card 3
+      author: Rukaiia
+      preConditions:
+        - onFail: CONTINUE
+        - onError: CONTINUE
+        - sqlCheck:
+            expectedResult: 0
+            sql: "SELECT COUNT(*) FROM cards WHERE id = 3"
+      changes:
         - insert:
             tableName: cards
             columns:
-              - column:
-                  name: id
-                  valueNumeric: 3
-              - column:
-                  name: owner_id
-                  valueNumeric: 2
-              - column:
-                  name: masked_number
-                  value: "9999-0000-1111-2222"
-              - column:
-                  name: balance
-                  valueNumeric: 500
-              - column:
-                  name: expiry_date
-                  valueDate: "2026-01-01"
-              - column:
-                  name: status
-                  value: "ACTIVE"
+              - column: { name: id, valueNumeric: 3 }
+              - column: { name: encrypted_number, value: "enc_3333" }
+              - column: { name: masked_number, value: "9999-0000-1111-2222" }
+              - column: { name: owner_id, valueNumeric: 2 }
+              - column: { name: balance, valueNumeric: 500 }
+              - column: { name: expiry_date, valueDate: "2026-01-01" }
+              - column: { name: status, value: "ACTIVE" }
 
+  - changeSet:
+      id: card 4
+      author: Rukaiia
+      preConditions:
+        - onFail: CONTINUE
+        - onError: CONTINUE
+        - sqlCheck:
+            expectedResult: 0
+            sql: "SELECT COUNT(*) FROM cards WHERE id = 4"
+      changes:
         - insert:
             tableName: cards
             columns:
-              - column:
-                  name: id
-                  valueNumeric: 4
-              - column:
-                  name: owner_id
-                  valueNumeric: 2
-              - column:
-                  name: masked_number
-                  value: "3333-4444-5555-6666"
-              - column:
-                  name: balance
-                  valueNumeric: 200
-              - column:
-                  name: expiry_date
-                  valueDate: "2025-12-31"
-              - column:
-                  name: status
-                  value: "EXPIRED"
+              - column: { name: id, valueNumeric: 4 }
+              - column: { name: encrypted_number, value: "enc_4444" }
+              - column: { name: masked_number, value: "3333-4444-5555-6666" }
+              - column: { name: owner_id, valueNumeric: 2 }
+              - column: { name: balance, valueNumeric: 200 }
+              - column: { name: expiry_date, valueDate: "2024-12-31" }   # ← ИСПРАВЛЕНО!
+              - column: { name: status, value: "EXPIRED" }

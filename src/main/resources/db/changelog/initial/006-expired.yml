@@ -1,0 +1,17 @@
+databaseChangeLog:
+  - changeSet:
+      id: fix expiry constraint
+      author: Rukaiia
+      changes:
+        - sql:
+            sql: |
+              ALTER TABLE cards DROP CONSTRAINT IF EXISTS chk_cards_expiry;
+
+              ALTER TABLE cards ADD CONSTRAINT chk_cards_expiry
+              CHECK (
+                  (status = 'ACTIVE' AND expiry_date >= CURRENT_DATE)
+                  OR
+                  (status = 'EXPIRED' AND expiry_date < CURRENT_DATE)
+                  OR
+                  (status = 'BLOCKED')
+              );
