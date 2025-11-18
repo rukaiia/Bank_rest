@@ -1,5 +1,13 @@
-/target
+.idea/
+*.iml
+out/
+
+target/
 *.jar
+
 *.log
+
+.DS_Store
+Thumbs.db
 
 
