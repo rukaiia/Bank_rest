@@ -7,11 +7,16 @@ import com.example.bankcards.entity.Card;
 import com.example.bankcards.entity.CardStatus;
 import com.example.bankcards.entity.User;
 import com.example.bankcards.entity.UserStatus;
+import com.example.bankcards.exception.BadRequestException;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -111,6 +116,41 @@ public Card createCard(Long userId){
 
             return fromCard;
         }
+
+    public Page<CardDto> findAllFiltered(
+            Integer page,
+            Integer size,
+            String sort,
+            CardStatus status,
+            LocalDate expiryBefore,
+            String last4
+    ) {
+
+        if (page == null || page < 0) page = 0;
+        if (size == null || size < 1) size = 10;
+
+        Sort sortObj = Sort.unsorted();
+        if (sort != null && !sort.isBlank()) {
+            try {
+                String[] parts = sort.split(",");
+                sortObj = Sort.by(
+                        parts.length > 1 && parts[1].equalsIgnoreCase("desc")
+                                ? Sort.Direction.DESC
+                                : Sort.Direction.ASC,
+                        parts[0]
+                );
+            } catch (Exception e) {
+                throw new BadRequestException("Invalid sort format. Use 'field,asc' or 'field,desc'");
+            }
+        }
+
+        Pageable pageable = PageRequest.of(page, size, sortObj);
+
+        Page<Card> cards = cardRepository.findFiltered(status, expiryBefore, last4, pageable);
+
+        return cards.map(cardMapper::toDto);
     }
+
+}
 
 

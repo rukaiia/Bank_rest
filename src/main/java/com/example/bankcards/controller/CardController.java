@@ -3,6 +3,7 @@ package com.example.bankcards.controller;
 import com.example.bankcards.dto.*;
 import com.example.bankcards.entity.Card;
 import com.example.bankcards.entity.CardStatus;
+import com.example.bankcards.exception.BadRequestException;
 import com.example.bankcards.exception.NotFoundException;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.service.CardService;
@@ -12,12 +13,15 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -35,11 +39,19 @@ public class CardController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/api/cards")
-    public List<CardDto> getAllCards() {
-        return cardRepository.streamAllBy()
-                .map(cardMapper::toDto)
-                .collect(Collectors.toList());
+    public Page<CardDto> getCards(
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size,
+            @RequestParam(required = false) String sort,
+            @RequestParam(required = false) CardStatus status,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate expiryBefore,
+            @RequestParam(required = false) String last4
+    ) {
+        return cardService.findAllFiltered(page, size, sort, status, expiryBefore, last4);
     }
+
+
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN') ")
     @GetMapping("/api/card")
     public Page<CardDto> getcard(
