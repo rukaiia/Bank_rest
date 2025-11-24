@@ -1,100 +1,142 @@
-<h1>🚀 Разработка Системы Управления Банковскими Картами</h1>
 
-<h2>📁 Стартовая структура</h2>
-  <p>
-    Проектная структура с директориями и описательными файлами (<code>README Controller.md</code>, <code>README Service.md</code> и т.д.) уже подготовлена.<br />
-    Все реализации нужно добавлять <strong>в соответствующие директории</strong>.
-  </p>
-  <p>
-    После завершения разработки <strong>временные README-файлы нужно удалить</strong>, чтобы они не попадали в итоговую сборку.
-  </p>
-  
-<h2>📝 Описание задачи</h2>
-  <p>Разработать backend-приложение на Java (Spring Boot) для управления банковскими картами:</p>
-  <ul>
-    <li>Создание и управление картами</li>
-    <li>Просмотр карт</li>
-    <li>Переводы между своими картами</li>
-  </ul>
 
-<h2>💳 Атрибуты карты</h2>
-  <ul>
-    <li>Номер карты (зашифрован, отображается маской: <code>**** **** **** 1234</code>)</li>
-    <li>Владелец</li>
-    <li>Срок действия</li>
-    <li>Статус: Активна, Заблокирована, Истек срок</li>
-    <li>Баланс</li>
-  </ul>
+# Bank Card Management System — Backend Service
 
-<h2>🧾 Требования</h2>
+This project is a backend service built with **Java (Spring Boot)** that provides secure management of bank cards, including card creation, lifecycle management, filtering, pagination, role-based access, JWT authentication, and internal transfers between cards.
 
-<h3>✅ Аутентификация и авторизация</h3>
-  <ul>
-    <li>Spring Security + JWT</li>
-    <li>Роли: <code>ADMIN</code> и <code>USER</code></li>
-  </ul>
+The system is structured using a clean layered architecture (Controller → Service → Repository → Domain → DTO → Security → Exception → Mapper) with strict separation of responsibilities.
 
-<h3>✅ Возможности</h3>
-<strong>Администратор:</strong>
-  <ul>
-    <li>Создаёт, блокирует, активирует, удаляет карты</li>
-    <li>Управляет пользователями</li>
-    <li>Видит все карты</li>
-  </ul>
+---
 
-<strong>Пользователь:</strong>
-  <ul>
-    <li>Просматривает свои карты (поиск + пагинация)</li>
-    <li>Запрашивает блокировку карты</li>
-    <li>Делает переводы между своими картами</li>
-    <li>Смотрит баланс</li>
-  </ul>
+## 1. Project Overview
 
-<h3>✅ API</h3>
-  <ul>
-    <li>CRUD для карт</li>
-    <li>Переводы между своими картами</li>
-    <li>Фильтрация и постраничная выдача</li>
-    <li>Валидация и сообщения об ошибках</li>
-  </ul>
+The application implements a complete card management workflow for both administrators and end-users. It provides secure handling of card data, encrypted storage of card numbers, transactional operations, error handling, and complete API documentation.
 
-<h3>✅ Безопасность</h3>
-  <ul>
-    <li>Шифрование данных</li>
-    <li>Ролевой доступ</li>
-    <li>Маскирование номеров карт</li>
-  </ul>
+---
 
-<h3>✅ Работа с БД</h3>
-  <ul>
-    <li>PostgreSQL или MySQL</li>
-    <li>Миграции через Liquibase (<code>src/main/resources/db/migration</code>)</li>
-  </ul>
+## 2. Functional Requirements
 
-<h3>✅ Документация</h3>
-  <ul>
-    <li>Swagger UI / OpenAPI — <code>docs/openapi.yaml</code></li>
-    <li><code>README.md</code> с инструкцией запуска</li>
-  </ul>
+### 2.1 Card Management
 
-<h3>✅ Развёртывание и тестирование</h3>
-  <ul>
-    <li>Docker Compose для dev-среды</li>
-    <li>Liquibase миграции</li>
-    <li>Юнит-тесты ключевой бизнес-логики</li>
-  </ul>
+* Create, update, block, activate, and delete cards
+* View card details
+* Encrypted storage of card numbers
+* Masked card number representation in API responses (e.g., `**** **** **** 1234`)
+* Support for card statuses:
 
-<h2>📊 Оценка</h2>
-  <ul>
-    <li>Соответствие требованиям</li>
-    <li>Чистота архитектуры и кода</li>
-    <li>Безопасность</li>
-    <li>Обработка ошибок</li>
-    <li>Покрытие тестами</li>
-    <li>ООП и уровни абстракции</li>
-  </ul>
+    * ACTIVE
+    * BLOCKED
+    * EXPIRED
+* Automatic expiration detection
+* Balance management
 
-<h2>💡 Технологии</h2>
-  <p>
-    Java 17+, Spring Boot, Spring Security, Spring Data JPA, PostgreSQL/MySQL, Liquibase, Docker, JWT, Swagger (OpenAPI)
-  </p>
+### 2.2 User Features
+
+* View own cards with filtering, sorting, and pagination
+* Search cards by the last four digits
+* Request card blocking
+* Perform internal transfers between user’s own cards
+* View balances and card information
+
+### 2.3 Administrator Features
+
+* Manage users
+* View all cards
+* Create, block, activate, or delete any card
+* Manage card lifecycle
+
+---
+
+## 3. Security Requirements
+
+* Authentication via **JWT**
+* Authorization via **Spring Security**
+* Role-based access control (RBAC)
+
+    * **ADMIN**
+    * **USER**
+* Secure password hashing (BCrypt)
+* Encrypted storage of card numbers
+* Controlled exposure of sensitive fields through DTOs
+
+---
+
+## 4. API Requirements
+
+The backend exposes a RESTful API supporting:
+
+* CRUD operations for cards
+* Internal transfers
+* Pagination (`page`, `size`)
+* Sorting (`sort=field,asc|desc`)
+* Filtering by:
+
+    * Status
+    * Expiration date
+    * Last 4 digits
+* Input validation
+* Detailed error messages
+* Unified error response format
+
+---
+
+
+
+## 5. Database and Persistence
+
+* PostgreSQL or MySQL as the primary relational database
+* Schema migrations handled via **Liquibase**
+
+    * Located in `src/main/resources/db/migration`
+* JPA/Hibernate for ORM
+* Efficient filtered queries using Spring Data JPA and `Pageable`
+
+---
+
+## 6. Documentation
+
+The project includes:
+
+* **OpenAPI/Swagger** specification for all endpoints
+* Swagger UI for interactive testing
+* OpenAPI YAML file (`docs/openapi.yaml`)
+* Comprehensive README with architecture and setup instructions
+
+---
+
+## 7. Deployment and Infrastructure
+
+* Docker Compose for local development environment
+* Application container + database container
+* Automatic execution of Liquibase migrations on startup
+* Environment-based configuration (`application.yml`, `application-prod.yml`)
+
+---
+
+## 8. Testing
+
+The system must include:
+
+* Unit tests for service-level logic
+* Tests for card transfer operations
+* Validation and error handling tests
+* Repository-level tests (optional but recommended)
+
+---
+
+## 9. Technologies Used
+
+* Java 17+
+* Spring Boot 3+
+* Spring Security
+* JWT (JSON Web Tokens)
+* Spring Data JPA
+* PostgreSQL
+* Liquibase
+* Docker & Docker Compose
+* Lombok
+* MapStruct (or manual mappers)
+* OpenAPI / Swagger
+
+---
+
