@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthenticationController {
     AuthenticationService authenticationService;
 
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN') ")
+//    @PreAuthorize("hasRole('USER') or hasRole('ADMIN') ")
     @PostMapping("/api/register")
     public ResponseEntity<String> register(@RequestBody UserDto userDto) {
         String token = authenticationService.registerUser(userDto);

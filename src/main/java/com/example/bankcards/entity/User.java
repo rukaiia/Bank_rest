@@ -34,9 +34,11 @@ public class User {
 
     @Column(nullable = false)
     private boolean enabled = true;
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private UserStatus status;
+    private UserStatus status = UserStatus.ACTIVE;
+
 
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
