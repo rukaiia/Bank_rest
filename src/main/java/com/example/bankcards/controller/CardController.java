@@ -54,7 +54,7 @@ public class CardController {
 
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN') ")
     @GetMapping("/api/card")
-    public Page<CardDto> getcard(
+    public Page<CardDto> getCard(
             @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
@@ -123,7 +123,7 @@ public class CardController {
         Card card = getCardOrThrowException(card_id);
         return ResponseEntity.ok(card.getBalance());
     }
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('ADMIN')")
 
     @PatchMapping("/api/cards/{cardId}/top-up")
     public ResponseEntity<CardDto> topUpBalance(
@@ -157,6 +157,7 @@ public class CardController {
                         )
                 );
     }
-
+//admin    eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImFkbWluMiIsImlhdCI6MTc2NDI3MTYyNiwiZXhwIjoxNzY0MzU4MDI2fQ.DD5fvUu4qubQ917esE7Ghn-fy5Zuuf5z8xN0QP-lcSU
+//user    eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX1VTRVIiXSwic3ViIjoianVzdFVzZXIiLCJpYXQiOjE3NjQyNzE4ODAsImV4cCI6MTc2NDM1ODI4MH0.f479cFdLZgvY65JYxGc_3zaOp8LLCI_RQN2XtEtw9Dg
 
 }

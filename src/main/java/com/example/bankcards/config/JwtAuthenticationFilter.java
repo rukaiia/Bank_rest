@@ -35,34 +35,38 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = null;
         String username = null;
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            token = authHeader.substring(7);
-            try {
-                if (jwtUtil.validateToken(token)) {
-                    username = jwtUtil.extractUsername(token);
-
-                    List<String> roles = jwtUtil.extractRoles(token);
-                    if (roles == null) {
-                        roles = Collections.emptyList();
-                    }
-
-                    List<SimpleGrantedAuthority> authorities = roles.stream()
-                            .map(role -> role.startsWith("ROLE_") ? role : "ROLE_" + role)
-                            .map(SimpleGrantedAuthority::new)
-                            .collect(Collectors.toList());
-
-
-                    if (SecurityContextHolder.getContext().getAuthentication() == null) {
-                        UsernamePasswordAuthenticationToken authToken =
-                                new UsernamePasswordAuthenticationToken(username, null, authorities);
-
-                        SecurityContextHolder.getContext().setAuthentication(authToken);
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
         }
+
+        token = authHeader.substring(7);
+        try {
+            if (jwtUtil.validateToken(token)) {
+                username = jwtUtil.extractUsername(token);
+
+                List<String> roles = jwtUtil.extractRoles(token);
+                if (roles == null) {
+                    roles = Collections.emptyList();
+                }
+
+                List<SimpleGrantedAuthority> authorities = roles.stream()
+                        .map(role -> role.startsWith("ROLE_") ? role : "ROLE_" + role)
+                        .map(SimpleGrantedAuthority::new)
+                        .collect(Collectors.toList());
+
+
+                if (SecurityContextHolder.getContext().getAuthentication() == null) {
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(username, null, authorities);
+
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
 
         filterChain.doFilter(request, response);
     }
