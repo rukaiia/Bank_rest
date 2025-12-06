@@ -4,10 +4,14 @@ import com.example.bankcards.dto.UserDto;
 import com.example.bankcards.entity.User;
 import com.example.bankcards.repository.UserRepository;
 import com.example.bankcards.security.JwtUtil;
+import com.example.bankcards.security.LoginAttemptService;
+import com.example.bankcards.service.AuditService;
 import com.example.bankcards.service.AuthenticationService;
+import com.google.common.util.concurrent.RateLimiter;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,6 +32,10 @@ public class AuthenticationController {
     JwtUtil jwtUtil;
     UserRepository userRepository;
     PasswordEncoder passwordEncoder;
+    private LoginAttemptService loginAttemptService;
+    private AuditService auditService;
+
+
 
     @PostMapping("/api/register")
     public ResponseEntity<?> register(@RequestBody UserDto userDto) {
@@ -41,23 +49,37 @@ public class AuthenticationController {
                 "refresh_token", refresh
         ));
     }
+
+
     @PostMapping("/api/login")
     public ResponseEntity<?> login(@RequestBody UserDto dto) {
-        User user = userRepository.findByUsername(dto.getUsername())
+        String username = dto.getUsername();
+
+        if (loginAttemptService.isBlocked(username)) {
+            auditService.logLogin(username, false);
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                    .body("Слишком много попыток входа. Попробуйте позже.");
+        }
+
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("user not found"));
 
         if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
+            loginAttemptService.loginFailed(username);
+            auditService.logLogin(username, false);
             throw new RuntimeException("wrong password");
         }
 
-        List<String> roles = List.of("ROLE_" + user.getRole().getName());
+        loginAttemptService.loginSucceeded(username);
+        auditService.logLogin(username, true);
 
+        List<String> roles = List.of("ROLE_" + user.getRole().getName());
         return ResponseEntity.ok(Map.of(
                 "access_token", jwtUtil.generateAccessToken(user.getUsername(), roles),
                 "refresh_token", jwtUtil.generateRefreshToken(user.getUsername())
         ));
     }
-    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/api/refresh")
     public ResponseEntity<?> refresh(@RequestBody Map<String, String> body) {
         String refresh = body.get("refresh_token");

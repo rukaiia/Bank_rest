@@ -8,6 +8,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Base64;
 
 @Entity
 @Table(name = "cards" , schema = "public")
@@ -42,5 +43,9 @@ public class Card {
 
     @Column(nullable = false)
     private BigDecimal balance = BigDecimal.ZERO;
+
+    public String getNumberDecoded() {
+        return new String(Base64.getDecoder().decode(encryptedNumber));
+    }
 }
 
