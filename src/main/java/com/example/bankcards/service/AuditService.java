@@ -4,6 +4,8 @@ import com.example.bankcards.entity.CardStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+
 @Slf4j
 @Service
 public class AuditService {
@@ -24,4 +26,11 @@ public class AuditService {
         if (cardNumber.length() < 4) return "****";
         return "**** **** **** " + cardNumber.substring(cardNumber.length() - 4);
     }
+    public void logTopUp(String maskedCardNumber, BigDecimal amount) {
+        log.info("Top-up: card={}, amount={}", maskedCardNumber, amount);
+    }
+    public void logTransfer(String fromMasked, String toMasked, BigDecimal amount) {
+        log.info("Transfer: from={} to={} amount={}", fromMasked, toMasked, amount);
+    }
+
 }

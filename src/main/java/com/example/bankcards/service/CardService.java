@@ -3,6 +3,7 @@ package com.example.bankcards.service;
 import com.example.bankcards.dto.CardDto;
 import com.example.bankcards.dto.CardMapper;
 import com.example.bankcards.dto.TransferRequest;
+import com.example.bankcards.dto.TransferResult;
 import com.example.bankcards.entity.Card;
 import com.example.bankcards.entity.CardStatus;
 import com.example.bankcards.entity.User;
@@ -17,9 +18,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.security.Security;
 import java.time.LocalDate;
 import java.util.Base64;
 import java.util.Random;
@@ -93,7 +99,7 @@ public Card createCard(Long userId){
 
 
         @Transactional
-        public Card transferBetweenCards(TransferRequest request) {
+        public TransferResult transferBetweenCards(TransferRequest request) {
             if (request.getAmount() == null || request.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
                 throw new IllegalArgumentException("Сумма перевода должна быть положительной");
             }
@@ -103,6 +109,11 @@ public Card createCard(Long userId){
 
             Card toCard = cardRepository.findById(request.getToCardId())
                     .orElseThrow(() -> new RuntimeException("Карта получателя не найдена"));
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String username = authentication.getName();
+            if (!fromCard.getOwner().getUsername().equals(username)){
+                throw new AccessDeniedException("Вы можете переводить только со своей карты");
+            }
 
             if (fromCard.getBalance().compareTo(request.getAmount()) < 0) {
                 throw new IllegalArgumentException("Недостаточно средств на карте отправителя");
@@ -113,8 +124,10 @@ public Card createCard(Long userId){
 
             cardRepository.save(fromCard);
             cardRepository.save(toCard);
+           String fromMasked =  fromCard.getMaskedNumber();
+            String toMasked = toCard.getMaskedNumber();
 
-            return fromCard;
+            return new TransferResult(fromCard, fromMasked , toMasked);
         }
 
     public Page<CardDto> findAllFiltered(

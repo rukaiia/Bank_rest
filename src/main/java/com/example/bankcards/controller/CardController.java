@@ -158,6 +158,7 @@ public class CardController {
             @RequestBody TopUpRequest request
     ) {
         CardDto updatedCard = cardService.topUpBalance(cardId, request.getAmount());
+        auditService.logTopUp(updatedCard.getMaskedNumber(),request.getAmount() );
         return ResponseEntity.ok(updatedCard);
     }
 
@@ -165,8 +166,11 @@ public class CardController {
 
         @PostMapping("/api/cards/transfer")
         public ResponseEntity<CardDto> transfer(@RequestBody TransferRequest request) {
-            Card updatedCard = cardService.transferBetweenCards(request);
-            return ResponseEntity.ok(cardMapper.toDto(updatedCard));
+            TransferResult updatedCard = cardService.transferBetweenCards(request);
+            auditService.logTransfer(updatedCard.getFromMasked(),
+                    updatedCard.getToMasked(),
+                    request.getAmount());
+            return ResponseEntity.ok(cardMapper.toDto(updatedCard.getUpdatedCard()));
         }
 
 
