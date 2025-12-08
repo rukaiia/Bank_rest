@@ -43,6 +43,8 @@ public class Card {
 
     @Column(nullable = false)
     private BigDecimal balance = BigDecimal.ZERO;
+    @Version
+    private Long version;
 
     public String getNumberDecoded() {
         return new String(Base64.getDecoder().decode(encryptedNumber));

@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: add version to card
+      author: rukaiia
+      changes:
+        - addColumn:
+            tableName: cards
+            columns:
+              - column:
+                  name: version
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
