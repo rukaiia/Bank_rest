@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 public interface TransferRepository extends JpaRepository<TransferEntity, Long> {
 
@@ -32,6 +33,10 @@ public interface TransferRepository extends JpaRepository<TransferEntity, Long> 
 
 
     Page<TransferEntity> findAll(Specification<TransferEntity> spec, Pageable pageable);
+
+    boolean existsByIdempotencyKey(String idempotencyKey);
+    Optional<TransferEntity> findByIdempotencyKey(String idempotencyKey);
+
 }
 
 

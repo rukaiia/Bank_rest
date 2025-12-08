@@ -9,5 +9,7 @@ public class TransferRequest {
     private Long fromCardId;
     private Long toCardId;
     private BigDecimal amount;
+    private String idempotencyKey;
+
 }
 

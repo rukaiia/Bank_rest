@@ -4,12 +4,10 @@ import com.example.bankcards.dto.CardDto;
 import com.example.bankcards.dto.CardMapper;
 import com.example.bankcards.dto.TransferRequest;
 import com.example.bankcards.dto.TransferResult;
-import com.example.bankcards.entity.Card;
-import com.example.bankcards.entity.CardStatus;
-import com.example.bankcards.entity.User;
-import com.example.bankcards.entity.UserStatus;
+import com.example.bankcards.entity.*;
 import com.example.bankcards.exception.BadRequestException;
 import com.example.bankcards.repository.CardRepository;
+import com.example.bankcards.repository.TransferRepository;
 import com.example.bankcards.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -27,8 +25,10 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.security.Security;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.Random;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +38,10 @@ public class CardService {
  private final CardRepository cardRepository;
     private final UserRepository userRepository;
     private final CardMapper cardMapper;
+    private final TransferRepository transferRepository;
+
+
+
 public Card createCard(Long userId){
    User userCard = userRepository.findById(userId)
            .orElseThrow(() -> new RuntimeException("пользователь с таким id не найден"));
@@ -98,37 +102,62 @@ public Card createCard(Long userId){
     }
 
 
-        @Transactional
-        public TransferResult transferBetweenCards(TransferRequest request) {
-            if (request.getAmount() == null || request.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
-                throw new IllegalArgumentException("Сумма перевода должна быть положительной");
-            }
+    @Transactional
+    public TransferResult transferBetweenCards(TransferRequest request) {
 
-            Card fromCard = cardRepository.findById(request.getFromCardId())
-                    .orElseThrow(() -> new RuntimeException("Карта отправителя не найдена"));
 
-            Card toCard = cardRepository.findById(request.getToCardId())
-                    .orElseThrow(() -> new RuntimeException("Карта получателя не найдена"));
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            String username = authentication.getName();
-            if (!fromCard.getOwner().getUsername().equals(username)){
-                throw new AccessDeniedException("Вы можете переводить только со своей карты");
-            }
 
-            if (fromCard.getBalance().compareTo(request.getAmount()) < 0) {
-                throw new IllegalArgumentException("Недостаточно средств на карте отправителя");
-            }
+        Card from = cardRepository.findById(request.getFromCardId())
+                .orElseThrow(() -> new RuntimeException("Карта отправителя не найдена"));
 
-            fromCard.setBalance(fromCard.getBalance().subtract(request.getAmount()));
-            toCard.setBalance(toCard.getBalance().add(request.getAmount()));
+        Card to = cardRepository.findById(request.getToCardId())
+                .orElseThrow(() -> new RuntimeException("Карта получателя не найдена"));
 
-            cardRepository.save(fromCard);
-            cardRepository.save(toCard);
-           String fromMasked =  fromCard.getMaskedNumber();
-            String toMasked = toCard.getMaskedNumber();
+        String key = from.getId() + ":" + to.getId() + ":" + request.getAmount();
 
-            return new TransferResult(fromCard, fromMasked , toMasked);
+        String me = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!from.getOwner().getUsername().equals(me)){
+            throw new AccessDeniedException("Можно переводить только со своей карты");
         }
+
+        if (from.getBalance().compareTo(request.getAmount()) < 0){
+            throw new IllegalArgumentException("Недостаточно средств");
+        }
+
+        from.setBalance(from.getBalance().subtract(request.getAmount()));
+        to.setBalance(to.getBalance().add(request.getAmount()));
+
+        cardRepository.save(from);
+        cardRepository.save(to);
+
+        TransferEntity entity = TransferEntity.builder()
+                .fromCard(from)
+                .toCard(to)
+                .amount(request.getAmount())
+                .status("SUCCESS")
+                .idempotencyKey(key)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        transferRepository.save(entity);
+
+        return new TransferResult(
+                from,
+                mask(from.getMaskedNumber()),
+                mask(to.getMaskedNumber()),
+                request.getAmount()
+        );
+
+
+    }
+
+
+
+
+    private String mask(String number){
+        return "**** **** **** " + number.substring(number.length()-4);
+    }
+
 
     public Page<CardDto> findAllFiltered(
             Integer page,
