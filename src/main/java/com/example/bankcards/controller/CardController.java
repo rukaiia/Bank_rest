@@ -3,11 +3,11 @@ package com.example.bankcards.controller;
 import com.example.bankcards.dto.*;
 import com.example.bankcards.entity.Card;
 import com.example.bankcards.entity.CardStatus;
-import com.example.bankcards.exception.BadRequestException;
 import com.example.bankcards.exception.NotFoundException;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.service.AuditService;
 import com.example.bankcards.service.CardService;
+import com.example.bankcards.service.TransferService;
 import com.google.common.util.concurrent.RateLimiter;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +15,6 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,11 +24,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
+import java.time.LocalDateTime;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @RestController
 @Transactional
@@ -42,6 +38,7 @@ public class CardController {
    private final CardMapper cardMapper;
     private RateLimiter cardRateLimiter = RateLimiter.create(1.0);
     private AuditService auditService;
+    private TransferService transferService;
 
 
 
@@ -172,6 +169,19 @@ public class CardController {
                     request.getAmount());
             return ResponseEntity.ok(cardMapper.toDto(updatedCard.getUpdatedCard()));
         }
+
+    @GetMapping("/api/history")
+    public Page<TransferHistoryDto> history(
+            @RequestParam(required = false) Long cardId,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return transferService.getHistory(cardId, type, start, end, page, size);
+    }
+
 
 
 
