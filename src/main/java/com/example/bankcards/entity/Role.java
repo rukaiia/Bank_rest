@@ -13,7 +13,9 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "roles")
+@Table(name = "roles", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "name", name = "unique_role_name")
+})
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

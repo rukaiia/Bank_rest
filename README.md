@@ -138,5 +138,9 @@ The system must include:
 * MapStruct (or manual mappers)
 * OpenAPI / Swagger
 
+
+
+![CI Maven](https://github.com/rukaiia/Bank_rest/actions/workflows/ci.yml/badge.svg)
+
 ---
 
