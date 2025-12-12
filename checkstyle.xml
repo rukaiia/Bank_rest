@@ -6,22 +6,10 @@
 <module name="Checker">
     <module name="TreeWalker">
 
-        <module name="JavadocMethod">
-            <property name="enabled" value="false"/>
-        </module>
-
-        <module name="JavadocVariable">
-            <property name="enabled" value="false"/>
-        </module>
-
-        <module name="FinalParameters">
-            <property name="enabled" value="false"/>
-        </module>
-
-        <module name="DesignForExtension">
-            <property name="enabled" value="false"/>
-        </module>
+        <module name="JavadocMethod"/>
+        <module name="JavadocVariable"/>
+        <module name="FinalParameters"/>
+        <module name="DesignForExtension"/>
 
     </module>
 </module>
-
