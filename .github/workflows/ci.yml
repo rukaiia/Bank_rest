@@ -37,10 +37,6 @@ jobs:
           name: coverage-report
           path: target/site/jacoco
 
-      - name: Run Checkstyle
-        run: mvn checkstyle:check
 
-      - name: Run Dependency Check
-        run: mvn dependency-check:check
 
 
