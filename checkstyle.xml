@@ -16,7 +16,7 @@
             <property name="allowMissingJavadoc" value="true"/>
         </module>
 
-        <module name="JavadocPackage" enabled="false"/>
+        <module name="TreeWalker"/>
 
         <!-- отключаем финальные параметры -->
         <module name="FinalParameters" enabled="false"/>
