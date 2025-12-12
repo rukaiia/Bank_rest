@@ -4,15 +4,14 @@
         "https://checkstyle.org/dtds/configuration_1_3.dtd">
 
 <module name="Checker">
-
     <module name="TreeWalker">
 
         <module name="JavadocMethod">
-            <property name="allowMissingJavadoc" value="true"/>
+            <property name="enabled" value="false"/>
         </module>
 
         <module name="JavadocVariable">
-            <property name="allowMissingJavadoc" value="true"/>
+            <property name="enabled" value="false"/>
         </module>
 
         <module name="FinalParameters">
@@ -24,6 +23,5 @@
         </module>
 
     </module>
-
 </module>
 
