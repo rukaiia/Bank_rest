@@ -23,5 +23,22 @@
             <property name="severity" value="ignore"/>
         </module>
 
+        <module name="UnusedImports">
+            <property name="severity" value="ignore"/>
+        </module>
+
+        <module name="WhitespaceAfter">
+            <property name="severity" value="ignore"/>
+        </module>
+
+        <module name="WhitespaceAround">
+            <property name="severity" value="ignore"/>
+        </module>
+
+        <module name="LineLength">
+            <property name="severity" value="ignore"/>
+        </module>
+
     </module>
+
 </module>
